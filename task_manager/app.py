@@ -64,20 +64,20 @@ def register():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        
+
         if len(password) < 8:
             flash('A senha deve ter pelo menos 8 caracteres.', 'warning')
             return redirect(url_for('register'))
-        
-        hashed_password = generate_password_hash(password, method='sha256')
-        
+
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+
         if User.query.filter_by(username=username).first() is None:
             new_user = User(username=username, password=hashed_password)
             db.session.add(new_user)
             db.session.commit()
             flash('Conta criada com sucesso!', 'success')
             return redirect(url_for('login'))
-        
+
         flash('Nome de usuário já existe. Por favor, escolha outro.', 'warning')
     return render_template('register.html')
 
