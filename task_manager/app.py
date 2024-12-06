@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+import pytz  # Importação do pytz para manipular fusos horários
 import os
 
 # Configuração do aplicativo Flask
@@ -31,8 +32,15 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200), nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=None)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __init__(self, title, description, user_id):
+        self.title = title
+        self.description = description
+        self.user_id = user_id
+        # Define o horário de criação usando o fuso horário de Brasília
+        self.created_at = datetime.now(pytz.timezone('America/Sao_Paulo'))
 
 # Carregar usuário
 @login_manager.user_loader
